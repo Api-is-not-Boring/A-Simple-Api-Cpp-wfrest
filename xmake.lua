@@ -20,8 +20,6 @@ package("wfrest")
         add_deps("apt::spdlog")
     end
 
-
-
     on_install("macosx", "linux", function (package)
         local configs = {kind = "static", plat = os.host(), arch = os.arch()}
         local options = {wfrest_lib = package:installdir("lib"), wfrest_inc = package:installdir("include")}
