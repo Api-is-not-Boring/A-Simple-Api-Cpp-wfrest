@@ -14,6 +14,13 @@ package("wfrest")
 
     add_deps("workflow", "brew::spdlog")
 
+if is_plat("macosx") then
+    add_deps("brew::spdlog")
+elseif is_plat("linux") then
+    add_deps("apt::spdlog")
+end
+
+
 
     on_install("macosx", "linux", function (package)
         local configs = {kind = "static", plat = os.host(), arch = os.arch()}
