@@ -14,11 +14,11 @@ package("wfrest")
 
     add_deps("workflow", "brew::spdlog")
 
-if is_plat("macosx") then
-    add_deps("brew::spdlog")
-elseif is_plat("linux") then
-    add_deps("apt::spdlog")
-end
+    if is_plat("macosx") then
+        add_deps("brew::spdlog")
+    elseif is_plat("linux") then
+        add_deps("apt::spdlog")
+    end
 
 
 
