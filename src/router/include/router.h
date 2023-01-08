@@ -5,6 +5,6 @@
 
 using namespace wfrest;
 
-inline void set_v1_bp(BluePrint &bp);
+void set_v1_bp(BluePrint &bp);
 
 #endif //A_SIMPLE_API_CPP_WFREST_ROUTER_H

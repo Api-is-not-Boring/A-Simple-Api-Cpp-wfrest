@@ -82,12 +82,11 @@ int main()
     BluePrint admin_bp;
     set_v1_bp(admin_bp);
 
-    app.register_blueprint(admin_bp, "/admin");
+    app.register_blueprint(admin_bp, "/api/v1");
 
     if (app.start(8000) == 0)
     {
         app.list_routes();
-        app.print_node_arch();
         wait_group.wait();
         app.stop();
     } else

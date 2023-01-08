@@ -1,4 +1,5 @@
 target("router")
-    add_headerfiles("router.h", {prefixdir = "include"})
-    add_files("*.cpp")
+    set_kind("static")
     add_packages("wfrest")
+    add_files("*.cpp")
+    add_includedirs("include", {public = true})

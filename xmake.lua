@@ -2,7 +2,7 @@ add_rules("mode.debug", "mode.release")
 set_project("A-Simple-Api-Cpp-wfrest")
 set_version("0.1.0")
 
-set_languages("c23", "c++23")
+set_languages("c23", "cxx23")
 
 package("wfrest")
     set_homepage("https://github.com/wfrest/wfrest")

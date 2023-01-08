@@ -8,74 +8,67 @@ cmake_policy(SET CMP0091 NEW)
 project(A-Simple-Api-Cpp-wfrest VERSION 0.1.0 LANGUAGES CXX C)
 
 # target
-add_executable(A-Simple-Api-Cpp-wfrest "")
-set_target_properties(A-Simple-Api-Cpp-wfrest PROPERTIES OUTPUT_NAME "A-Simple-Api-Cpp-wfrest")
-set_target_properties(A-Simple-Api-Cpp-wfrest PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
-target_include_directories(A-Simple-Api-Cpp-wfrest PRIVATE
+add_executable(main "")
+set_target_properties(main PROPERTIES OUTPUT_NAME "main")
+set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+add_dependencies(main router)
+target_include_directories(main PRIVATE
+    src/router/include
+)
+target_include_directories(main PRIVATE
     /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
     /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/include
     /opt/homebrew/Cellar/openssl@3/3.0.7/include
     /opt/homebrew/Cellar/spdlog/1.11.0/include
     /opt/homebrew/Cellar/fmt/9.1.0/include
 )
-target_compile_definitions(A-Simple-Api-Cpp-wfrest PRIVATE
+target_compile_definitions(main PRIVATE
     SPDLOG_SHARED_LIB
     SPDLOG_COMPILED_LIB
     SPDLOG_FMT_EXTERNAL
 )
-target_compile_options(A-Simple-Api-Cpp-wfrest PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-target>
-    $<$<COMPILE_LANGUAGE:CXX>:-target>
-    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:C>:-isysroot>
-    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
-    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
-    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+target_compile_options(main PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
-set_target_properties(A-Simple-Api-Cpp-wfrest PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_features(A-Simple-Api-Cpp-wfrest PRIVATE cxx_std_23)
+set_target_properties(main PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(main PRIVATE cxx_std_23)
 if(MSVC)
-    target_compile_options(A-Simple-Api-Cpp-wfrest PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
+    target_compile_options(main PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
 else()
-    target_compile_options(A-Simple-Api-Cpp-wfrest PRIVATE -O3)
+    target_compile_options(main PRIVATE -O3)
 endif()
 if(MSVC)
 else()
-    target_compile_options(A-Simple-Api-Cpp-wfrest PRIVATE -fvisibility=hidden)
+    target_compile_options(main PRIVATE -fvisibility=hidden)
 endif()
 if(MSVC)
-    set_property(TARGET A-Simple-Api-Cpp-wfrest PROPERTY
+    set_property(TARGET main PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-target_link_libraries(A-Simple-Api-Cpp-wfrest PRIVATE
-    router
+target_link_libraries(main PRIVATE
     wfrest
     workflow
     ssl
     crypto
     spdlog
     fmt
+    router
     z
 )
-target_link_directories(A-Simple-Api-Cpp-wfrest PRIVATE
+target_link_directories(main PRIVATE
     /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/lib
     /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/lib
     /opt/homebrew/Cellar/openssl@3/3.0.7/lib
     /opt/homebrew/Cellar/spdlog/1.11.0/lib
     /opt/homebrew/Cellar/fmt/9.1.0/lib
+    build/macosx/arm64/release
 )
-target_link_options(A-Simple-Api-Cpp-wfrest PRIVATE
-    -target
-    arm64-apple-macos13.1
-    -isysroot
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+target_link_options(main PRIVATE
     -stdlib=libc++
     -pthread
 )
-target_sources(A-Simple-Api-Cpp-wfrest PRIVATE
+target_sources(main PRIVATE
     src/main.cpp
 )
 
@@ -83,6 +76,12 @@ target_sources(A-Simple-Api-Cpp-wfrest PRIVATE
 add_library(router STATIC "")
 set_target_properties(router PROPERTIES OUTPUT_NAME "router")
 set_target_properties(router PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+target_include_directories(router PRIVATE
+    src/router/include
+)
+target_include_directories(router INTERFACE
+    src/router/include
+)
 target_include_directories(router PRIVATE
     /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
     /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/include
@@ -96,14 +95,6 @@ target_compile_definitions(router PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(router PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-target>
-    $<$<COMPILE_LANGUAGE:CXX>:-target>
-    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:C>:-isysroot>
-    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
-    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
-    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -139,10 +130,6 @@ target_link_directories(router PRIVATE
     /opt/homebrew/Cellar/fmt/9.1.0/lib
 )
 target_link_options(router PRIVATE
-    -target
-    arm64-apple-macos13.1
-    -isysroot
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
