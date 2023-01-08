@@ -1,6 +1,5 @@
 #include "workflow/WFFacilities.h"
 #include "wfrest/HttpServer.h"
-#include "wfrest/json.hpp"
 #include "spdlog/spdlog.h"
 #include "router.h"
 
@@ -34,55 +33,11 @@ int main()
                      task->peer_port());
     });
 
-    // curl -v http://ip:port/json1
-    app.GET("/json1", [](const HttpReq *req, HttpResp *resp)
-    {
-        Json json;
-        json["test"] = 123;
-        json["json"] = "test json";
-        resp->Json(json);
-    });
+    BluePrint v1;
+    set_v1_bp(v1);
 
-    // curl -v http://ip:port/json2
-    app.GET("/json2", [](const HttpReq *req, HttpResp *resp)
-    {
-        std::string valid_text = R"(
-        {
-            "numbers": [1, 2, 3]
-        }
-        )";
-        resp->Json(valid_text);
-    });
+    app.register_blueprint(v1, "/api/v1");
 
-    // curl -v http://ip:port/json3
-    app.GET("/json3", [](const HttpReq *req, HttpResp *resp)
-    {
-        std::string invalid_text = R"(
-        {
-            "strings": ["extra", "comma", ]
-        }
-        )";
-        resp->Json(invalid_text);
-    });
-
-    // recieve json
-    //   curl -X POST http://ip:port/json4
-    //   -H 'Content-Type: application/json'
-    //   -d '{"login":"my_login","password":"my_password"}'
-    app.POST("/json4", [](const HttpReq *req, HttpResp *resp)
-    {
-        if (req->content_type() != APPLICATION_JSON)
-        {
-            resp->String("NOT APPLICATION_JSON");
-            return;
-        }
-        fprintf(stderr, "Json : %s", req->json().dump(4).c_str());
-    });
-
-    BluePrint admin_bp;
-    set_v1_bp(admin_bp);
-
-    app.register_blueprint(admin_bp, "/api/v1");
 
     if (app.start(8000) == 0)
     {

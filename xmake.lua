@@ -2,6 +2,7 @@ add_rules("mode.debug", "mode.release")
 set_project("A-Simple-Api-Cpp-wfrest")
 set_version("0.1.0")
 
+set_allowedplats("linux", "macosx")
 set_languages("c23", "cxx23")
 
 package("wfrest")
@@ -24,8 +25,6 @@ package("wfrest")
         local configs = {kind = "static", plat = os.host(), arch = os.arch()}
         local options = {wfrest_lib = package:installdir("lib"), wfrest_inc = package:installdir("include")}
         import("package.tools.xmake").install(package, configs, options)
-        --print(import("package.tools.xmake").buildenvs(package))
-        --os.cp("libwfrest.a", package:installdir("lib"))
     end)
 
 package_end()

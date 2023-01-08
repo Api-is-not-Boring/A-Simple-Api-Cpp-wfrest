@@ -1,0 +1,6 @@
+${define NAME}
+${define DESCRIPTION}
+#define LANGUAGE "C"
+${define URL}
+${define VERSION}
+${define GIT_COMMIT}

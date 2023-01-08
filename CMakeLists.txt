@@ -28,6 +28,14 @@ target_compile_definitions(main PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(main PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -65,6 +73,10 @@ target_link_directories(main PRIVATE
     build/macosx/arm64/release
 )
 target_link_options(main PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
@@ -78,6 +90,7 @@ set_target_properties(router PROPERTIES OUTPUT_NAME "router")
 set_target_properties(router PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
 target_include_directories(router PRIVATE
     src/router/include
+    build/config
 )
 target_include_directories(router INTERFACE
     src/router/include
@@ -95,6 +108,14 @@ target_compile_definitions(router PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(router PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -130,10 +151,14 @@ target_link_directories(router PRIVATE
     /opt/homebrew/Cellar/fmt/9.1.0/lib
 )
 target_link_options(router PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
 target_sources(router PRIVATE
-    src/router/router.cpp
+    src/router/v1.cpp
 )
 
