@@ -38,7 +38,6 @@ int main()
 
     app.register_blueprint(v1, "/api/v1");
 
-
     if (app.start(8000) == 0)
     {
         app.list_routes();

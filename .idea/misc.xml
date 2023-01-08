@@ -3,7 +3,8 @@
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
   <component name="SerialMonitorSettings" BaudRate="9600" LineEndingsIndex="0" ShowStatusWidget="true" />
   <component name="XMakeProjectSettings">
-    <option name="currentArchitecture" value="x86_64" />
+    <option name="currentArchitecture" value="arm64" />
+    <option name="currentMode" value="debug" />
     <option name="workingDirectory" value="$PROJECT_DIR$" />
   </component>
 </project>
