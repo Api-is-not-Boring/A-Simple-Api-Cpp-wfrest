@@ -1,5 +1,7 @@
-#include "boost/process/system.hpp"
-#include "boost/process/io.hpp"
+#include <boost/process.hpp>
+#include <boost/regex.hpp>
+#include <string>
+#include <iostream>
 #include "router.h"
 #include "wfrest/HttpServer.h"
 #include "wfrest/json.hpp"
@@ -13,8 +15,24 @@ pid_t process = getpid();
 
 void get_connections()
 {
+    bp::ipstream pipe_stream;
     std::string command = "lsof -a -n -P -p " + std::to_string(process) + " -i tcp";
-    bp::system(command, bp::std_out > stdout, bp::std_err > stderr);
+    bp::system(command, bp::std_out > pipe_stream, bp::std_err > stderr);
+    boost::regex expr{R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)$)"};
+    boost::smatch match;
+    std::string line;
+    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
+        if (boost::regex_search(line, match, expr))
+        {
+            if (match.size() == 7)
+            {
+                std::cout << "Connection: " << match[1] << " " << match[2] << " " << match[3] << " " << match[6] << std::endl;
+            } else
+            {
+                std::cout << "Connection: " << match[1] << " " << match[2] << " " << match[3] << " " << match[6] << std::endl;
+            }
+        }
+//        std::cout << line << std::endl;
 }
 
 void set_v1_bp(BluePrint &bp)
