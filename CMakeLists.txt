@@ -8,12 +8,18 @@ cmake_policy(SET CMP0091 NEW)
 project(A-Simple-Api-Cpp-wfrest VERSION 0.1.0 LANGUAGES CXX C)
 
 # target
+add_library(config INTERFACE)
+target_include_directories(config INTERFACE
+    build/config
+)
+# target
 add_executable(main "")
 set_target_properties(main PROPERTIES OUTPUT_NAME "main")
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
 add_dependencies(main router)
 target_include_directories(main PRIVATE
     src/router/include
+    build/config
 )
 target_include_directories(main PRIVATE
     /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
@@ -28,14 +34,6 @@ target_compile_definitions(main PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(main PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-target>
-    $<$<COMPILE_LANGUAGE:CXX>:-target>
-    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:C>:-isysroot>
-    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
-    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
-    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -62,6 +60,8 @@ target_link_libraries(main PRIVATE
     spdlog
     fmt
     router
+    boost_atomic-mt
+    boost_filesystem-mt
     z
 )
 target_link_directories(main PRIVATE
@@ -71,12 +71,9 @@ target_link_directories(main PRIVATE
     /opt/homebrew/Cellar/spdlog/1.11.0/lib
     /opt/homebrew/Cellar/fmt/9.1.0/lib
     build/macosx/arm64/release
+    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/lib
 )
 target_link_options(main PRIVATE
-    -target
-    arm64-apple-macos13.1
-    -isysroot
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
@@ -88,6 +85,7 @@ target_sources(main PRIVATE
 add_library(router STATIC "")
 set_target_properties(router PROPERTIES OUTPUT_NAME "router")
 set_target_properties(router PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+add_dependencies(router config)
 target_include_directories(router PRIVATE
     src/router/include
     build/config
@@ -101,6 +99,7 @@ target_include_directories(router PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/include
     /opt/homebrew/Cellar/spdlog/1.11.0/include
     /opt/homebrew/Cellar/fmt/9.1.0/include
+    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/include
 )
 target_compile_definitions(router PRIVATE
     SPDLOG_SHARED_LIB
@@ -108,14 +107,6 @@ target_compile_definitions(router PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(router PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-target>
-    $<$<COMPILE_LANGUAGE:CXX>:-target>
-    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
-    $<$<COMPILE_LANGUAGE:C>:-isysroot>
-    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
-    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
-    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -141,6 +132,8 @@ target_link_libraries(router PRIVATE
     crypto
     spdlog
     fmt
+    boost_atomic-mt
+    boost_filesystem-mt
     z
 )
 target_link_directories(router PRIVATE
@@ -149,12 +142,9 @@ target_link_directories(router PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/lib
     /opt/homebrew/Cellar/spdlog/1.11.0/lib
     /opt/homebrew/Cellar/fmt/9.1.0/lib
+    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/lib
 )
 target_link_options(router PRIVATE
-    -target
-    arm64-apple-macos13.1
-    -isysroot
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )

@@ -30,5 +30,6 @@ package("wfrest")
 package_end()
 
 add_requires("wfrest main", {alias = "wfrest"})
+add_requires("boost")
 
 includes("src")
