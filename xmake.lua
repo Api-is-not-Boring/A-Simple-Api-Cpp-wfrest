@@ -32,7 +32,4 @@ package_end()
 
 add_requires("wfrest main", {alias = "wfrest"})
 
-target("A-Simple-Api-Cpp-wfrest")
-    set_kind("binary")
-    add_packages("wfrest")
-    add_files("src/*.cpp")
+includes("src")

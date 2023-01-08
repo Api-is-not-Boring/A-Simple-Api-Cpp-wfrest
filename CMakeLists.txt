@@ -51,6 +51,7 @@ if(MSVC)
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 target_link_libraries(A-Simple-Api-Cpp-wfrest PRIVATE
+    router
     wfrest
     workflow
     ssl
@@ -76,5 +77,76 @@ target_link_options(A-Simple-Api-Cpp-wfrest PRIVATE
 )
 target_sources(A-Simple-Api-Cpp-wfrest PRIVATE
     src/main.cpp
+)
+
+# target
+add_library(router STATIC "")
+set_target_properties(router PROPERTIES OUTPUT_NAME "router")
+set_target_properties(router PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+target_include_directories(router PRIVATE
+    /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
+    /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/include
+    /opt/homebrew/Cellar/openssl@3/3.0.7/include
+    /opt/homebrew/Cellar/spdlog/1.11.0/include
+    /opt/homebrew/Cellar/fmt/9.1.0/include
+)
+target_compile_definitions(router PRIVATE
+    SPDLOG_SHARED_LIB
+    SPDLOG_COMPILED_LIB
+    SPDLOG_FMT_EXTERNAL
+)
+target_compile_options(router PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
+    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
+)
+set_target_properties(router PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(router PRIVATE cxx_std_23)
+if(MSVC)
+    target_compile_options(router PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
+else()
+    target_compile_options(router PRIVATE -O3)
+endif()
+if(MSVC)
+else()
+    target_compile_options(router PRIVATE -fvisibility=hidden)
+endif()
+if(MSVC)
+    set_property(TARGET router PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(router PRIVATE
+    wfrest
+    workflow
+    ssl
+    crypto
+    spdlog
+    fmt
+    z
+)
+target_link_directories(router PRIVATE
+    /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/lib
+    /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/lib
+    /opt/homebrew/Cellar/openssl@3/3.0.7/lib
+    /opt/homebrew/Cellar/spdlog/1.11.0/lib
+    /opt/homebrew/Cellar/fmt/9.1.0/lib
+)
+target_link_options(router PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+    -stdlib=libc++
+    -pthread
+)
+target_sources(router PRIVATE
+    src/router/router.cpp
 )
 
