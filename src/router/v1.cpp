@@ -4,9 +4,9 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 #include <iostream>
+#include <wfrest/HttpServer.h>
+#include <wfrest/json.hpp>
 #include "router.h"
-#include "wfrest/HttpServer.h"
-#include "wfrest/json.hpp"
 #include "project.h"
 
 using namespace wfrest;
@@ -28,17 +28,14 @@ std::vector<ordered_json> get_connections()
         if (boost::regex_search(line, match, expr))
         {
             std::string id = match[1].str(); id.pop_back();
-            std::string protocol = match[2].str();
-            std::string type = match[6].str() == "LISTEN" ? "LISTENING" : match[6].str();
             std::string local = match[4].str().empty() ? match[3].str() : match[4].str();
             boost::replace_first(local, "*", "0.0.0.0");
-            std::string remote = match[5].str().empty() ? "0.0.0.0:0" : match[5].str();
             ordered_json connection {
                     {"id", boost::lexical_cast<int>(id)},
-                    {"protocol", protocol},
-                    {"type", type},
+                    {"protocol", match[2].str()},
+                    {"type",  match[6].str() == "LISTEN" ? "LISTENING" : match[6].str()},
                     {"local", local},
-                    {"remote", remote}
+                    {"remote", match[5].str().empty() ? "0.0.0.0:0" : match[5].str()}
             };
             connections.push_back(connection);
         }
@@ -73,7 +70,7 @@ void set_v1_bp(BluePrint &bp)
         };
         resp->Json(json.dump());
     });
-    //TODO: get client ip
+
     bp.GET("/connections", [](const HttpReq *req, HttpResp *resp)
     {
         ordered_json json = {

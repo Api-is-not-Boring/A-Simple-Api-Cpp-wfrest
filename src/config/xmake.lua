@@ -6,4 +6,3 @@ target("config")
         DESCRIPTION = "A simple API build with C++ and wfrest framework",
         URL = "https://github.com/Api-is-not-Boring/A-Simple-Api-Cpp-wfrest",
     }})
-    add_includedirs("$(buildir)/config", {public = true})

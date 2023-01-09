@@ -9,17 +9,14 @@ project(A-Simple-Api-Cpp-wfrest VERSION 0.1.0 LANGUAGES CXX C)
 
 # target
 add_library(config INTERFACE)
-target_include_directories(config INTERFACE
-    build/config
-)
 # target
 add_executable(main "")
 set_target_properties(main PROPERTIES OUTPUT_NAME "main")
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
-add_dependencies(main router)
+add_dependencies(main router middleware)
 target_include_directories(main PRIVATE
     src/router/include
-    build/config
+    src/middleware/include
 )
 target_include_directories(main PRIVATE
     /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
@@ -27,6 +24,7 @@ target_include_directories(main PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/include
     /opt/homebrew/Cellar/spdlog/1.11.0/include
     /opt/homebrew/Cellar/fmt/9.1.0/include
+    /Users/pk/.xmake/packages/b/boost/1.80.0/08fea26ea0ad46d28302ecf9178d31e6/include
 )
 target_compile_definitions(main PRIVATE
     SPDLOG_SHARED_LIB
@@ -34,6 +32,14 @@ target_compile_definitions(main PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(main PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -59,9 +65,10 @@ target_link_libraries(main PRIVATE
     crypto
     spdlog
     fmt
-    router
     boost_atomic-mt
     boost_filesystem-mt
+    router
+    middleware
     z
 )
 target_link_directories(main PRIVATE
@@ -70,10 +77,14 @@ target_link_directories(main PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/lib
     /opt/homebrew/Cellar/spdlog/1.11.0/lib
     /opt/homebrew/Cellar/fmt/9.1.0/lib
+    /Users/pk/.xmake/packages/b/boost/1.80.0/08fea26ea0ad46d28302ecf9178d31e6/lib
     build/macosx/arm64/release
-    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/lib
 )
 target_link_options(main PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
@@ -82,13 +93,89 @@ target_sources(main PRIVATE
 )
 
 # target
+add_library(middleware STATIC "")
+set_target_properties(middleware PROPERTIES OUTPUT_NAME "middleware")
+set_target_properties(middleware PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+target_include_directories(middleware PRIVATE
+    src/middleware/include
+)
+target_include_directories(middleware INTERFACE
+    src/middleware/include
+)
+target_include_directories(middleware PRIVATE
+    /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/include
+    /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/include
+    /opt/homebrew/Cellar/openssl@3/3.0.7/include
+    /opt/homebrew/Cellar/spdlog/1.11.0/include
+    /opt/homebrew/Cellar/fmt/9.1.0/include
+)
+target_compile_definitions(middleware PRIVATE
+    SPDLOG_SHARED_LIB
+    SPDLOG_COMPILED_LIB
+    SPDLOG_FMT_EXTERNAL
+)
+target_compile_options(middleware PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
+    $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
+)
+set_target_properties(middleware PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(middleware PRIVATE cxx_std_23)
+if(MSVC)
+    target_compile_options(middleware PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
+else()
+    target_compile_options(middleware PRIVATE -O3)
+endif()
+if(MSVC)
+else()
+    target_compile_options(middleware PRIVATE -fvisibility=hidden)
+endif()
+if(MSVC)
+    set_property(TARGET middleware PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(middleware PRIVATE
+    wfrest
+    workflow
+    ssl
+    crypto
+    spdlog
+    fmt
+    z
+)
+target_link_directories(middleware PRIVATE
+    /Users/pk/.xmake/packages/w/wfrest/main/a5b4e345986a4740863d88955955c4b5/lib
+    /Users/pk/.xmake/packages/w/workflow/v0.10.5/f8c3c72b47994a2d95e744a99c056e54/lib
+    /opt/homebrew/Cellar/openssl@3/3.0.7/lib
+    /opt/homebrew/Cellar/spdlog/1.11.0/lib
+    /opt/homebrew/Cellar/fmt/9.1.0/lib
+)
+target_link_options(middleware PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
+    -stdlib=libc++
+    -pthread
+)
+target_sources(middleware PRIVATE
+    src/middleware/server_header.cpp
+)
+
+# target
 add_library(router STATIC "")
 set_target_properties(router PROPERTIES OUTPUT_NAME "router")
 set_target_properties(router PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
-add_dependencies(router config)
 target_include_directories(router PRIVATE
-    src/router/include
     build/config
+    src/router/include
 )
 target_include_directories(router INTERFACE
     src/router/include
@@ -99,7 +186,7 @@ target_include_directories(router PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/include
     /opt/homebrew/Cellar/spdlog/1.11.0/include
     /opt/homebrew/Cellar/fmt/9.1.0/include
-    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/include
+    /Users/pk/.xmake/packages/b/boost/1.80.0/08fea26ea0ad46d28302ecf9178d31e6/include
 )
 target_compile_definitions(router PRIVATE
     SPDLOG_SHARED_LIB
@@ -107,6 +194,14 @@ target_compile_definitions(router PRIVATE
     SPDLOG_FMT_EXTERNAL
 )
 target_compile_options(router PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-target>
+    $<$<COMPILE_LANGUAGE:CXX>:-target>
+    $<$<COMPILE_LANGUAGE:C>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:CXX>:arm64-apple-macos13.1>
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk>
     $<$<COMPILE_LANGUAGE:C>:-DNDEBUG>
     $<$<COMPILE_LANGUAGE:CXX>:-DNDEBUG>
 )
@@ -142,9 +237,13 @@ target_link_directories(router PRIVATE
     /opt/homebrew/Cellar/openssl@3/3.0.7/lib
     /opt/homebrew/Cellar/spdlog/1.11.0/lib
     /opt/homebrew/Cellar/fmt/9.1.0/lib
-    /Users/pk/.xmake/packages/b/boost/1.81.0/5571e11a6b1548268633a1b80cca99b3/lib
+    /Users/pk/.xmake/packages/b/boost/1.80.0/08fea26ea0ad46d28302ecf9178d31e6/lib
 )
 target_link_options(router PRIVATE
+    -target
+    arm64-apple-macos13.1
+    -isysroot
+    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
     -stdlib=libc++
     -pthread
 )
