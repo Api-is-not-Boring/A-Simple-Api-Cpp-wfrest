@@ -1,10 +1,8 @@
 #include <wfrest/HttpServer.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/process.hpp>
-#include <boost/regex.hpp>
-#include <iostream>
+#include <cstdio>
+#include <fstream>
+#include <regex>
 #include <string>
 #include <wfrest/json.hpp>
 
@@ -13,37 +11,37 @@
 
 using namespace wfrest;
 using ordered_json = nlohmann::ordered_json;
-namespace bp = boost::process;
 
 pid_t process = getpid();
 
-std::vector<ordered_json> get_connections()
+std::regex pattern(
+    R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)$)",
+    std::regex_constants::multiline);
+
+std::vector<ordered_json> get_cons()
 {
     std::vector<ordered_json> connections;
-    bp::ipstream pipe_stream;
     std::string command = "lsof -a -n -P -p " + std::to_string(process) + " -i tcp";
-    bp::child c(command, bp::std_out > pipe_stream, bp::std_err > stderr);
-    boost::regex expr {
-        R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)$)"
-    };
-    boost::smatch match;
-    std::string line;
-    while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
-        if (boost::regex_search(line, match, expr)) {
-            std::string id = match[1].str();
-            id.pop_back();
-            std::string local = match[4].str().empty() ? match[3].str() : match[4].str();
-            boost::replace_first(local, "*", "0.0.0.0");
-            ordered_json connection {
-                { "id", boost::lexical_cast<int>(id) },
-                { "protocol", match[2].str() },
-                { "type", match[6].str() == "LISTEN" ? "LISTENING" : match[6].str() },
-                { "local", local },
-                { "remote", match[5].str().empty() ? "0.0.0.0:0" : match[5].str() }
-            };
-            connections.push_back(connection);
+    std::unique_ptr<::FILE, decltype(&::pclose)> pipe(::popen(command.c_str(), "r"), &::pclose);
+    if (pipe) {
+        char buffer[256];
+        while (::fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
+            std::string line(buffer);
+            std::smatch match;
+            if (std::regex_search(line, match, pattern, std::regex_constants::match_not_eol)) {
+                ordered_json connection;
+                connection["id"] = std::stoi(match[1].str());
+                connection["protocol"] = match[2].str();
+                connection["type"] = match[6] == "LISTEN" ? "LISTENING" : match[6].str();
+                connection["local"] = std::regex_replace(
+                    match[4].str().empty() ? match[3].str() : match[4].str(),
+                    std::regex("\\*"),
+                    "0.0.0.0");
+                connection["remote"] = match[5].str().empty() ? "0.0.0.0:0" : match[5].str();
+                connections.push_back(connection);
+            }
         }
-    c.wait();
+    }
     return connections;
 }
 
@@ -73,7 +71,7 @@ void set_v1_bp(BluePrint& bp)
     });
 
     bp.GET("/connections", [](const HttpReq* req, HttpResp* resp) {
-        ordered_json json = { { "connections", get_connections() } };
+        ordered_json json = { { "connections", get_cons() } };
         resp->Json(json.dump());
     });
 }

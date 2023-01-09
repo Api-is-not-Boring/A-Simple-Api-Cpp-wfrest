@@ -4,7 +4,7 @@
 #include <wfrest/HttpServer.h>
 #include <workflow/WFFacilities.h>
 
-#include <boost/lexical_cast.hpp>
+#include <string>
 
 #include "middleware.h"
 #include "router.h"
@@ -27,7 +27,7 @@ int main()
 
     app.track([](HttpTask* server_task) {
         HttpResp* resp = server_task->get_resp();
-        int code = boost::lexical_cast<int>(resp->get_status_code());
+        int code = std::stoi(resp->get_status_code());
         HttpReq* req = server_task->get_req();
         auto* task = dynamic_cast<HttpServerTask*>(server_task);
         Timestamp current_time = Timestamp::now();
