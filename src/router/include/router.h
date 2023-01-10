@@ -4,7 +4,6 @@
 #include <wfrest/BluePrint.h>
 
 using namespace wfrest;
-using ordered_json = nlohmann::ordered_json;
 
 void set_v1_bp(BluePrint &bp);
 
