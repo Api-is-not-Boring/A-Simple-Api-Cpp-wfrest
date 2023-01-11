@@ -88,9 +88,7 @@ int model::car::Db::count()
 
 void model::car::Db::car_add(const Car& car)
 {
-    if (count() >= 20) {
-        db_reset();
-    }
+    if (count() >= 20) db_reset();
     car_storage.insert(car);
 }
 
@@ -106,5 +104,6 @@ void model::car::Db::car_update(const Car& car)
 
 void model::car::Db::car_delete(int id)
 {
+    if (count() <= 6) db_reset();
     car_storage.remove<Car>(id);
 }
