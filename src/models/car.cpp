@@ -69,17 +69,26 @@ ordered_json model::car::Db::get_car(int id)
     return car;
 }
 
-ordered_json model::car::Db::car_add(const Car& car)
+void model::car::Db::car_add(const Car& car)
 {
     auto total = car_storage.count<::Car>();
     if (total >= 20) {
         model::car::Db::db_reset();
     }
     car_storage.insert(car);
-    return model::car::Db::get_car(static_cast<int>(car_storage.last_insert_rowid()));
+}
+
+int model::car::Db::last_insert_id()
+{
+    return static_cast<int>(car_storage.last_insert_rowid());
 }
 
 void model::car::Db::car_update(const Car& car)
 {
     car_storage.update(car);
+}
+
+void model::car::Db::car_delete(int id)
+{
+    car_storage.remove<Car>(id);
 }

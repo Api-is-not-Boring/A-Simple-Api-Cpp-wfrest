@@ -45,6 +45,23 @@ void router::ApiRoutes::set_v2_bp(BluePrint& bp)
             }.dump());
         }
     });
+
+    bp.DELETE("/cars/{id}", [](const HttpReq* req, HttpResp* resp) {
+        if (req->has_param("id")) {
+            int id = std::stoi(req->param("id"));
+            auto car = Db::get_car(id);
+            Db::car_delete(id);
+            resp->Json(ordered_json {
+                    { "message", "Car deleted" },
+                    { "car", car }
+            }.dump());
+        } else {
+            resp->set_status(400);
+            resp->Json(ordered_json {
+                    { "error", "Missing id parameter" }
+            }.dump());
+        }
+    });
 }
 
 void router::ApiRoutes::fix_v2_route(HttpServer &server) {
@@ -72,11 +89,11 @@ void router::ApiRoutes::fix_v2_route(HttpServer &server) {
     server.POST("/api/v2/cars", [](const HttpReq* req, HttpResp* resp) {
         auto body = req->json();
         auto car = body.get<Car>();
-        car = Db::car_add(car);
+        Db::car_add(car);
         resp->set_status(201);
         resp->Json(ordered_json {
                 { "message", "Car added" },
-                { "car", car }
+                { "car", Db::get_car(Db::last_insert_id()) }
         }.dump());
     });
 
@@ -97,6 +114,23 @@ void router::ApiRoutes::fix_v2_route(HttpServer &server) {
             Db::car_update(car);
             resp->Json(ordered_json {
                     { "message", "Car updated" },
+                    { "car", car }
+            }.dump());
+        } else {
+            resp->set_status(400);
+            resp->Json(ordered_json {
+                    { "error", "Missing id parameter" }
+            }.dump());
+        }
+    });
+
+    server.DELETE("/api/v2/cars", [](const HttpReq* req, HttpResp* resp) {
+        if (req->has_query("id")) {
+            auto id = req->query("id");
+            auto car = Db::get_car(std::stoi(id));
+            Db::car_delete(std::stoi(id));
+            resp->Json(ordered_json {
+                    { "message", "Car deleted" },
                     { "car", car }
             }.dump());
         } else {
