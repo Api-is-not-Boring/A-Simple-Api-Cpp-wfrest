@@ -52,7 +52,7 @@ int main()
     app.register_blueprint(api_routes, "/api");
 
     if (app.start(8000) == 0) {
-        app.list_routes();
+        app.print_node_arch();
         wait_group.wait();
         getchar();
         app.stop();

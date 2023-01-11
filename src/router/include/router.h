@@ -3,9 +3,11 @@
 
 #include <wfrest/HttpServer.h>
 #include <wfrest/BluePrint.h>
+#include "models.h"
 
 namespace router {
     using namespace wfrest;
+    using namespace model::car;
     class ApiRoutes : public BluePrint {
         BluePrint v1;
         BluePrint v2;

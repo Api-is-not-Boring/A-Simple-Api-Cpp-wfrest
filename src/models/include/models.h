@@ -41,6 +41,8 @@ namespace model::car {
             void db_reset();
             std::vector<ordered_json> all();
             ordered_json get_car(int id);
+            bool car_exists(int id);
+            int count();
             void car_add(const Car& car);
             int last_insert_id();
             void car_update(const Car& car);

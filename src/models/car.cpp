@@ -65,15 +65,31 @@ std::vector<ordered_json> model::car::Db::all()
 
 ordered_json model::car::Db::get_car(int id)
 {
-    auto car = car_storage.get<Car>(id);
-    return car;
+    try {
+        auto car = car_storage.get<Car>(id);
+        return car;
+    } catch (std::system_error &e) {
+        return {};
+    } catch (std::exception &e) {
+        return {};
+    }
+    
+}
+
+bool model::car::Db::car_exists(int id)
+{
+    return !(car_storage.get_pointer<Car>(id) == nullptr);
+}
+
+int model::car::Db::count()
+{
+    return car_storage.count<Car>();
 }
 
 void model::car::Db::car_add(const Car& car)
 {
-    auto total = car_storage.count<::Car>();
-    if (total >= 20) {
-        model::car::Db::db_reset();
+    if (count() >= 20) {
+        db_reset();
     }
     car_storage.insert(car);
 }
