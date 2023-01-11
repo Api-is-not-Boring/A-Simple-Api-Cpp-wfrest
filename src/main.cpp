@@ -47,13 +47,9 @@ int main()
 
     app.Use(ServerHeader());
 
-    BluePrint v1;
-    set_v1_bp(v1);
-    BluePrint v2;
-    set_v2_bp(v2);
+    router::ApiRoutes api_routes(app);
 
-    app.register_blueprint(v1, "/api/v1");
-    app.register_blueprint(v2, "/api/v2");
+    app.register_blueprint(api_routes, "/api");
 
     if (app.start(8000) == 0) {
         app.list_routes();

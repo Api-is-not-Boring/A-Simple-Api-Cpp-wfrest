@@ -18,7 +18,7 @@ void get_cons(HttpResp* resp)
     resp->Json(json.dump());
 }
 
-void set_v1_bp(BluePrint& bp)
+void router::ApiRoutes::set_v1_bp(BluePrint& bp)
 {
     bp.GET("/ping", [](const HttpReq* req, HttpResp* resp) {
         ordered_json json = {

@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "models.h"
 
 using model::car::Car;
@@ -21,10 +23,16 @@ std::vector<Car> init_cars = {
 void model::car::to_json(ordered_json& j, const Car& c)
 {
     j = ordered_json {
-        { "id", c.id },
+        { "id", isnan(c.id) ? -1 : c.id },
         { "name", c.name },
         { "price", c.price }
     };
+}
+
+void model::car::from_json(const ordered_json &j, Car &c) {
+    c.id = !j.contains("id") ? -1 : j.at("id").get<int>();
+    c.name = j.at("name").get<std::string>();
+    c.price = j.at("price").get<int>();
 }
 
 void model::car::Db::init()
@@ -41,13 +49,8 @@ void model::car::Db::init()
 
 void model::car::Db::db_reset()
 {
-    car_storage.remove_all<Car>();
-    car_storage.transaction([&] {
-        for (auto& car : init_cars) {
-            car_storage.insert(car);
-        }
-        return true;
-    });
+    car_storage.drop_table("cars");
+    model::car::Db::init();
 }
 
 std::vector<ordered_json> model::car::Db::all()
@@ -60,7 +63,23 @@ std::vector<ordered_json> model::car::Db::all()
     return json_cars;
 }
 
-void model::car::Db::car_add(const Car& car)
+ordered_json model::car::Db::get_car(int id)
 {
+    auto car = car_storage.get<Car>(id);
+    return car;
+}
+
+ordered_json model::car::Db::car_add(const Car& car)
+{
+    auto total = car_storage.count<::Car>();
+    if (total >= 20) {
+        model::car::Db::db_reset();
+    }
     car_storage.insert(car);
+    return model::car::Db::get_car(static_cast<int>(car_storage.last_insert_rowid()));
+}
+
+void model::car::Db::car_update(const Car& car)
+{
+    car_storage.update(car);
 }
