@@ -1,0 +1,74 @@
+name: Automate Api Test
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  Api-Test:
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest", "macos-latest" ]
+        include:
+          - os: "ubuntu-latest"
+            postman-cli: "https://dl-cli.pstmn.io/install/linux64.sh"
+          - os: "macos-latest"
+            postman-cli: "https://dl-cli.pstmn.io/install/osx_64.sh"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Get latest [xmake]
+      uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: latest
+        actions-cache-folder: '.xmake-cache'
+        actions-cache-key: ${{ matrix.os }}'-cache'
+
+    - name: Build
+      run: xmake -y -v
+
+    - name: Run Api
+      run: xmake r &
+
+    - name: Install Postman CLI
+      run: |
+        curl -o- ${{matrix.postman-cli}} | sh
+    - name: Login to Postman CLI
+      run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+    - name: Run API tests
+      run: |
+        postman collection run "7779863-874f5270-9a2e-448e-a963-87f8b9b0cbbd" -e "7779863-a2096246-922a-440d-9863-d540e8ff461d"
+  CodeQL-Analysis:
+    needs: Api-Test
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
