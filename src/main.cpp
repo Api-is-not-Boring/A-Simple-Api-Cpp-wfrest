@@ -47,7 +47,7 @@ int main()
             logger->info(msg);
     });
 
-    app.Use(ServerHeader());
+    app.Use(middleware::ServerHeader());
 
     std::string app_secret = nanoid::generate(32);
     setenv("APP_SECRET", app_secret.c_str(), 1);

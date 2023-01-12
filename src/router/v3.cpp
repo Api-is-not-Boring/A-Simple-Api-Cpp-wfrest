@@ -27,11 +27,11 @@ void router::ApiRoutes::set_v3_bp(BluePrint& bp)
         "/check", [](const HttpReq* req, HttpResp* resp) {
             resp->Json({ { "message", "[v3] -> 200 Token Valid" } });
         },
-        JwtAuth());
+        middleware::JwtAuth());
 
     bp.GET(
         "/secure", [](const HttpReq* req, HttpResp* resp) {
-            resp->Json({ { "s3c5et", ::getenv("APP_SECRET") } });
+            resp->Json({ { "s3cr5t", ::getenv("APP_SECRET") } });
         },
-        JwtAuth());
+        middleware::JwtAuth());
 }
