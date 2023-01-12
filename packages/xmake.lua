@@ -10,7 +10,7 @@ package("wfrest")
     if is_plat("macosx") then
         add_deps("brew::spdlog")
     elseif is_plat("linux") then
-        add_deps("apt::spdlog")
+        add_deps("apt::libspdlog-dev")
     end
 
     on_install("macosx", "linux", function (package)
