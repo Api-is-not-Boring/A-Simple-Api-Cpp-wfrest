@@ -1,22 +1,16 @@
 #include "models.h"
-#include <fstream>
-#include <regex>
 #include <string>
-#include <unistd.h>
 
 using namespace model::connection;
 using ordered_json = nlohmann::ordered_json;
 
-pid_t process = getpid();
-
-Connections::Connection::Connection(std::string& line)
-    : l(line)
-    , p()
+Connections::Connection::Connection(const std::shared_ptr<std::array<char, 256>>& b)
+    : l(b->begin(), b->end())
 {
     this->p = std::regex { R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)$)",
         std::regex_constants::multiline };
     std::smatch match;
-    if (std::regex_search(line, match, p)) {
+    if (std::regex_search(l, match, p)) {
         (*this)["id"] = std::stoi(match[1].str());
         (*this)["protocol"] = match[2].str();
         (*this)["type"] = match[6] == "LISTEN" ? "LISTENING" : match[6].str();
@@ -29,17 +23,13 @@ Connections::Connection::Connection(std::string& line)
 }
 
 Connections::Connections()
-    : command("lsof -a -n -P -p " + std::to_string(process) + " -i tcp")
-    , lsof(::popen(command.c_str(), "r"), &::pclose)
+    : lsof(::popen(command.c_str(), "r"), &::pclose)
 {
     if (lsof) {
-        char* buffer = new char[256];
-        while (::fgets(buffer, 256, lsof.get()) != nullptr) {
-            std::string line(buffer);
-            Connection c(line);
-            if (!c.empty())
-                this->push_back(c);
+        while (::fgets(b->data(), int(b->size()), lsof.get()) != nullptr) {
+            if (std::string(b->begin(), b->end()).find("COMMAND") == std::string::npos) {
+                this->push_back(Connection(b));
+            }
         }
-        delete[] buffer;
     }
 }

@@ -1,15 +1,18 @@
+#include <sqlite_orm/sqlite_orm.h>
 #include <utility>
 
 #include "models.h"
 
+using namespace sqlite_orm;
 using model::car::Car;
+
 auto car_storage = make_storage(":memory:",
     make_table("cars",
         make_column("id", &Car::id, primary_key().autoincrement()),
         make_column("name", &Car::name),
         make_column("price", &Car::price)));
 
-std::vector<Car> init_cars = {
+const std::vector<Car> init_cars = {
     Car { -1, "Audi", 52642 },
     Car { -1, "Mercedes", 57127 },
     Car { -1, "Skoda", 9000 },
@@ -29,7 +32,8 @@ void model::car::to_json(ordered_json& j, const Car& c)
     };
 }
 
-void model::car::from_json(const ordered_json &j, Car &c) {
+void model::car::from_json(const ordered_json& j, Car& c)
+{
     c.id = !j.contains("id") ? -1 : j.at("id").get<int>();
     c.name = j.at("name").get<std::string>();
     c.price = j.at("price").get<int>();
@@ -39,7 +43,7 @@ void model::car::Db::init()
 {
     car_storage.sync_schema();
     car_storage.remove_all<Car>();
-    car_storage.transaction([&] {
+    car_storage.transaction([] {
         for (auto& car : init_cars) {
             car_storage.insert(car);
         }
@@ -68,17 +72,14 @@ ordered_json model::car::Db::get_car(int id)
     try {
         auto car = car_storage.get<Car>(id);
         return car;
-    } catch (std::system_error &e) {
-        return {};
-    } catch (std::exception &e) {
+    } catch (...) {
         return {};
     }
-    
 }
 
 bool model::car::Db::car_exists(int id)
 {
-    return !(car_storage.get_pointer<Car>(id) == nullptr);
+    return car_storage.get_pointer<Car>(id) != nullptr;
 }
 
 int model::car::Db::count()
@@ -88,7 +89,8 @@ int model::car::Db::count()
 
 void model::car::Db::car_add(const Car& car)
 {
-    if (count() >= 20) db_reset();
+    if (count() >= 20)
+        db_reset();
     car_storage.insert(car);
 }
 
@@ -104,6 +106,7 @@ void model::car::Db::car_update(const Car& car)
 
 void model::car::Db::car_delete(int id)
 {
-    if (count() <= 6) db_reset();
+    if (count() <= 6)
+        db_reset();
     car_storage.remove<Car>(id);
 }

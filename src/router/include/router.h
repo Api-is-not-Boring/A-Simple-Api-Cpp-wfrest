@@ -6,12 +6,11 @@
 #include "models.h"
 
 namespace router {
-    using namespace wfrest;
-    using namespace model::car;
+    using BluePrint = wfrest::BluePrint;
+    using HttpServer = wfrest::HttpServer;
     class ApiRoutes : public BluePrint {
         BluePrint v1;
         BluePrint v2;
-    private:
         static void set_v1_bp(BluePrint& bp);
         static void set_v2_bp(BluePrint& bp);
         static void fix_v2_route(HttpServer& server);
@@ -23,6 +22,7 @@ namespace router {
             this->add_blueprint(this->v2, "/v2");
             fix_v2_route(server);
         }
+        static int req_id(std::string const& id) { return std::stoi(id); }
     };
 }
 

@@ -3,22 +3,26 @@
 
 #include <regex>
 #include <utility>
-#include <sqlite_orm/sqlite_orm.h>
+#include <unistd.h>
 #include <wfrest/json.hpp>
 
-using namespace sqlite_orm;
+
 using ordered_json = nlohmann::ordered_json;
+
+const pid_t process = getpid();
 
 namespace model::connection {
     class Connections : public std::vector<ordered_json> {
-        std::string command;
+        using buffer = std::shared_ptr<std::array<char, 256>>; // 256
+        std::string command ="lsof -a -n -P -p " + std::to_string(process) + " -i tcp";
         std::unique_ptr<::FILE, decltype(&::pclose)> lsof;
+        buffer b = std::make_shared<std::array<char, 256>>();
         class Connection : public ordered_json {
         private:
             std::string l;
             std::regex p;
         public:
-            explicit Connection(std::string &line);
+            explicit Connection(const std::shared_ptr<std::array<char, 256>>& b);
         };
     public:
         explicit Connections();

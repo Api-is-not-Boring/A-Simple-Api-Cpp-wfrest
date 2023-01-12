@@ -13,23 +13,23 @@ using namespace wfrest;
 
 static WFFacilities::WaitGroup wait_group(1);
 
-void sig_handler(int signo) { wait_group.done(); }
-
-auto logger = spdlog::stdout_color_mt("wfrest");
+void sig_handler(int signum) { wait_group.done(); }
 
 int main()
 {
+
     signal(SIGINT, sig_handler);
 
     HttpServer app;
 
+    auto logger = spdlog::stdout_color_mt("wfrest");
     logger->set_pattern("[%Y-%m-%d %T] [ %n - %P ] [%^%l%$] %v");
 
-    app.track([](HttpTask* server_task) {
-        HttpResp* resp = server_task->get_resp();
+    app.track([&logger](HttpTask* server_task) {
+        HttpResp const* resp = server_task->get_resp();
         int code = std::stoi(resp->get_status_code());
-        HttpReq* req = server_task->get_req();
-        auto* task = dynamic_cast<HttpServerTask*>(server_task);
+        HttpReq const* req = server_task->get_req();
+        auto const* task = dynamic_cast<HttpServerTask*>(server_task);
         Timestamp current_time = Timestamp::now();
         std::string fmt_time = current_time.to_format_str();
         std::string msg = fmt::format("| [{}] {} {} <- {}:{}", resp->get_status_code(),
