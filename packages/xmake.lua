@@ -5,7 +5,7 @@ package("wfrest")
     add_urls("https://github.com/sogou/workflow/archive/refs/tags/$(version).tar.gz",
             "https://github.com/wfrest/wfrest.git")
 
-    add_deps("workflow", "brew::spdlog", "fmt")
+    add_deps("workflow", "fmt")
 
     if is_plat("macosx") then
         add_deps("brew::spdlog")
