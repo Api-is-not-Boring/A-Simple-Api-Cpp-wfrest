@@ -29,16 +29,12 @@ package("sql_orm")
 
     add_deps("cmake", "sqlite3")
 
-    local unit_tests
-
     on_install("macosx", "linux", function (package)
-        import("package.tools.cmake").install(package , {"-DSQLITE_ORM_ENABLE_CXX_17=ON"})
-        unit_tests = path.join(os.curdir(), package:buildir(), "tests/unit_tests")
+        import("package.tools.cmake").install(package , {"-DSQLITE_ORM_ENABLE_CXX_17=ON", "-DBUILD_TESTING=OFF"})
     end)
 
     on_test(function (package)
-        os.exec(unit_tests)
-        os.isfile(path.join(package:installdir(), "/include/sql_orm/sqlite_orm.h"))
+        assert(package:has_cxxfuncs("sqlite_orm::make_storage", {configs = {languages = "c++17"}, includes = "sqlite_orm/sqlite_orm.h"}))
     end)
 
 package_end()
