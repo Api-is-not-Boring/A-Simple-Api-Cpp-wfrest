@@ -11,8 +11,10 @@ namespace router {
     class ApiRoutes : public BluePrint {
         BluePrint v1;
         BluePrint v2;
+        BluePrint v3;
         static void set_v1_bp(BluePrint& bp);
         static void set_v2_bp(BluePrint& bp);
+        static void set_v3_bp(BluePrint& bp);
         static void fix_v2_route(HttpServer& server);
     public:
         explicit ApiRoutes(HttpServer& server) {
@@ -21,6 +23,8 @@ namespace router {
             set_v2_bp(this->v2);
             this->add_blueprint(this->v2, "/v2");
             fix_v2_route(server);
+            set_v3_bp(this->v3);
+            this->add_blueprint(this->v3, "/v3");
         }
         static int req_id(std::string const& id) { return std::stoi(id); }
     };

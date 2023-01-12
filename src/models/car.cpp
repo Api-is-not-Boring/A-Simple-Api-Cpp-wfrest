@@ -54,7 +54,7 @@ void model::car::Db::init()
 void model::car::Db::db_reset()
 {
     car_storage.drop_table("cars");
-    model::car::Db::init();
+    init();
 }
 
 std::vector<ordered_json> model::car::Db::all()

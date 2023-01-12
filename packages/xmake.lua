@@ -43,6 +43,65 @@ package("sql_orm")
 
 package_end()
 
+package("bcrypt")
+    set_homepage("https://github.com/hilch/Bcrypt.cpp")
+
+    set_urls("https://github.com/hilch/Bcrypt.cpp.git")
+
+    add_deps("cmake")
+
+    on_install("macosx", "linux", function (package)
+        io.writefile("xmake.lua", [[
+            add_rules("mode.debug", "mode.release")
+            set_languages("c11", "cxx11")
+            target("bcrypt")
+                set_kind("static")
+                add_files("src/*.cpp")
+                add_includedirs("include")
+                add_headerfiles("include/*.h")
+        ]])
+        import("package.tools.xmake").install(package)
+    end)
+
+    on_test(function (package)
+        assert(package:check_cxxsnippets({test = [[
+            void test() {
+                std::string password = "top_secret";
+
+                std::string hash = bcrypt::generateHash(password);
+
+                std::cout << "Hash: " << hash << std::endl;
+
+                std::cout << "\"" << password << "\" : " << bcrypt::validatePassword(password,hash) << std::endl;
+                std::cout << "\"wrong\" : " << bcrypt::validatePassword("wrong",hash) << std::endl;
+            }
+        ]]}, {configs = {languages = "c++17"}, includes = { "bcrypt.h", "iostream", "string" }}))
+    end)
+
+package_end()
+
+package("nanoid-cpp")
+    set_homepage("https://github.com/mcmikecreations/nanoid_cpp")
+
+    set_urls("https://github.com/mcmikecreations/nanoid_cpp.git")
+
+    add_deps("cmake")
+
+    on_install("macosx", "linux", function (package)
+        import("package.tools.cmake").install(package, {"-DBUILD_EXAMPLES=OFF", "-DBUILD_TESTS=OFF", "-DCMAKE_CXX_STANDARD=17"})
+    end)
+
+    on_test(function (package)
+        assert(package:check_cxxsnippets({test = [[
+            void test() {
+                std::string id = nanoid::generate(36);
+                std::cout << id << std::endl;
+            }
+        ]]}, {configs = {languages = "c++17"}, includes = { "nanoid/nanoid.h", "iostream", "string" }}))
+    end)
+
+package_end()
+
 package("jwt-cpp")
     set_homepage("https://github.com/Thalhammer/jwt-cpp")
 
@@ -55,7 +114,6 @@ package("jwt-cpp")
     end)
 
     on_test(function (package)
-        os.vrun("echo 'int main(){}' > test.cpp")
         assert(package:check_cxxsnippets({test = [[
             #include <jwt-cpp/jwt.h>
             void test() {

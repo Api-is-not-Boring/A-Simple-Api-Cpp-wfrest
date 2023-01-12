@@ -9,6 +9,8 @@ includes("packages")
 
 add_requires("wfrest main", {alias = "wfrest"})
 add_requires("sql_orm v1.8", {alias = "sql_orm"})
+add_requires("bcrypt", {alias = "bcrypt"})
+add_requires("nanoid-cpp", {alias = "nanoid-cpp"})
 add_requires("jwt-cpp", {alias = "jwt-cpp"})
 
 includes("src")

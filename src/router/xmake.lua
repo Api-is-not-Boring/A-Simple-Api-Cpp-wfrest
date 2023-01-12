@@ -1,7 +1,7 @@
 target("router")
     set_kind("static")
     add_packages("wfrest")
-    add_deps("models")
+    add_deps("models", "middleware")
     add_files("*.cpp")
     add_includedirs("$(buildir)/config")
     add_includedirs("include", {public = true})

@@ -54,6 +54,24 @@ namespace model::car {
         };
     }
 
+namespace model::user {
+    struct User {
+        int id;
+        std::string username;
+        std::string password;
+    };
+
+    void to_json(ordered_json& j, const User& u);
+    void from_json(const ordered_json& j, User& u);
+
+    namespace Db {
+        void init();
+        void db_reset();
+
+        bool authenticate(std::map<std::string, std::pair<std::string, std::string>> login);
+        std::string generate_token(std::string s);
+    };
+}
 
 
 #endif //A_SIMPLE_API_CPP_WFREST_MODELS_H

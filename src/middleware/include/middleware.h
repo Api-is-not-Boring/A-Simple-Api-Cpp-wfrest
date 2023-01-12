@@ -15,4 +15,13 @@ public:
 
 };
 
+class JwtAuth : public Aspect
+{
+public:
+    bool before(const HttpReq *req, HttpResp *resp) override;
+
+    bool after(const HttpReq *req, HttpResp *resp) override;
+
+};
+
 #endif //A_SIMPLE_API_CPP_WFREST_MIDDLEWARE_H

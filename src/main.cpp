@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include <fmt/core.h>
+#include <nanoid/nanoid.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <wfrest/HttpServer.h>
@@ -47,6 +49,8 @@ int main()
 
     app.Use(ServerHeader());
 
+    std::string app_secret = nanoid::generate(32);
+    setenv("APP_SECRET", app_secret.c_str(), 1);
     router::ApiRoutes api_routes(app);
 
     app.register_blueprint(api_routes, "/api");
