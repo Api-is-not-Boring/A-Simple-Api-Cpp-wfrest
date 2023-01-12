@@ -1,6 +1,6 @@
 #include <sqlite_orm/sqlite_orm.h>
 #include <utility>
-
+#include <random>
 #include "models.h"
 
 using namespace sqlite_orm;
@@ -26,7 +26,7 @@ const std::vector<Car> init_cars = {
 void model::car::to_json(ordered_json& j, const Car& c)
 {
     j = ordered_json {
-        { "id", isnan(c.id) ? -1 : c.id },
+        { "id", std::isnan(c.id) ? -1 : c.id },
         { "name", c.name },
         { "price", c.price }
     };

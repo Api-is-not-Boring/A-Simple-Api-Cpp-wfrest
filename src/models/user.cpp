@@ -5,6 +5,7 @@
 #include <sqlite_orm/sqlite_orm.h>
 #include <utility>
 
+
 using namespace sqlite_orm;
 using model::user::User;
 
@@ -17,7 +18,7 @@ auto user_storage = make_storage(":memory:",
 void model::user::to_json(ordered_json& j, const User& u)
 {
     j = ordered_json {
-        { "id", isnan(u.id) ? -1 : u.id },
+        { "id", std::isnan(u.id) ? -1 : u.id },
         { "username", u.username },
         { "password", u.password }
     };
