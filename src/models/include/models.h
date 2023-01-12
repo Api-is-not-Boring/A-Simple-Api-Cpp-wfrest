@@ -7,7 +7,7 @@
 #include <wfrest/json.hpp>
 
 
-using ordered_json = nlohmann::ordered_json;
+using ordered_json = nlohmann::ordered_json;;
 
 const pid_t process = getpid();
 

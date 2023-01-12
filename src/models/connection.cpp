@@ -1,5 +1,7 @@
-#include "models.h"
 #include <string>
+#include <regex>
+#include "models.h"
+
 
 using namespace model::connection;
 using ordered_json = nlohmann::ordered_json;
