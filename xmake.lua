@@ -7,6 +7,7 @@ set_languages("c17", "cxx17")
 
 includes("packages")
 
+add_requires("fmt")
 add_requires("wfrest main", {alias = "wfrest"})
 add_requires("sql_orm v1.8", {alias = "sql_orm"})
 add_requires("bcrypt", {alias = "bcrypt"})
