@@ -48,4 +48,10 @@ void router::ApiRoutes::set_v1_bp(BluePrint& bp)
     bp.GET("/connections", 1, [](const HttpReq* req, HttpResp* resp) {
         get_cons(resp);
     });
+
+    bp.GET("/", 1, [](const HttpReq* req, HttpResp* resp) {
+        resp->set_status(301);
+        resp->set_header_pair("Location", "/api/v1/info");
+        resp->Json({ { "message", "[router] -> 301 Redirect" } });
+    });
 }

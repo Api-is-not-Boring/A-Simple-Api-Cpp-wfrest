@@ -3,7 +3,7 @@
 #include <jwt-cpp/jwt.h>
 #include <wfrest/json.hpp>
 
-bool token_valid(std::string const &token, std::string s, wfrest::HttpResp* resp)
+bool token_valid(std::string const& token, std::string s, wfrest::HttpResp* resp)
 {
     try {
         auto decoded = jwt::decode(token);

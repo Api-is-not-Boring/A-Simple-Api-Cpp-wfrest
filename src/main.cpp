@@ -1,5 +1,5 @@
-#include <cstdlib>
 #include <csignal>
+#include <cstdlib>
 #include <fmt/core.h>
 #include <nanoid/nanoid.h>
 #include <spdlog/sinks/stdout_color_sinks.h>

@@ -5,7 +5,6 @@
 #include <sqlite_orm/sqlite_orm.h>
 #include <utility>
 
-
 using namespace sqlite_orm;
 using model::user::User;
 

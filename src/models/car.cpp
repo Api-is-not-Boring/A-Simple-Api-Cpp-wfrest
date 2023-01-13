@@ -1,7 +1,7 @@
+#include "models.h"
+#include <random>
 #include <sqlite_orm/sqlite_orm.h>
 #include <utility>
-#include <random>
-#include "models.h"
 
 using namespace sqlite_orm;
 using model::car::Car;
