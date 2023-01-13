@@ -11,7 +11,7 @@ bool token_valid(std::string const& token, std::string s, wfrest::HttpResp* resp
                             .allow_algorithm(jwt::algorithm::hs512(std::move(s)));
         verifier.verify(decoded);
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::system_error& e) {
         resp->set_status(401);
         std::string msg = std::string("[v3] -> 401 ") + e.what();
         resp->Json({ { "message", msg } });

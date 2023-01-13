@@ -14,13 +14,21 @@
 
 using namespace wfrest;
 
-static WFFacilities::WaitGroup wait_group(1);
+using wait_group = WFFacilities::WaitGroup ;
 
-void sig_handler(int signum) { wait_group.done(); }
+void sig_handler(int signum) {
+    if (signum == SIGINT) {
+        spdlog::warn("SIGINT received. Exiting...");
+        exit(0);
+    } else if (signum == SIGTERM) {
+        spdlog::warn("SIGTERM received. Exiting...");
+        exit(0);
+    }
+}
 
 int main()
 {
-
+    wait_group wg(1);
     signal(SIGINT, sig_handler);
 
     HttpServer app;
@@ -58,11 +66,12 @@ int main()
 
     if (app.start(8000) == 0) {
         app.print_node_arch();
-        wait_group.wait();
+        wg.wait();
         getchar();
         app.stop();
     } else {
         logger->error("Cannot start server");
+        wg.done();
         exit(1);
     }
     return 0;
