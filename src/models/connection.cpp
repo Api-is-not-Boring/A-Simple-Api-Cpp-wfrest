@@ -9,8 +9,7 @@ using ordered_json = nlohmann::ordered_json;
 Connections::Connection::Connection(const std::shared_ptr<std::array<char, 256>>& b)
     : l(b->begin(), b->end())
 {
-    this->p = std::regex { R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)$)",
-        std::regex_constants::multiline };
+    this->p = std::regex { R"(^.+\s(\d+u).+(TCP)\s(\*:\d+|(.+:\d+)->(.+:\d+))\s\((\w+)\)\n)" };
     std::smatch match;
     if (std::regex_search(l, match, p)) {
         (*this)["id"] = std::stoi(match[1].str());
