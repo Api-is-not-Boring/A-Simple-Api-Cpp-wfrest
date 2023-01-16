@@ -54,4 +54,9 @@ void router::ApiRoutes::set_v1_bp(BluePrint& bp)
         resp->set_header_pair("Location", "/api/v1/info");
         resp->Json({ { "message", "[router] -> 301 Redirect" } });
     });
+
+    bp.POST("/ping", [](const HttpReq* req, HttpResp* resp) {
+        resp->set_status(405);
+        resp->Json({ { "message", "[router] -> 405 Method Not Allowed" } });
+    });
 }

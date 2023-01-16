@@ -138,4 +138,11 @@ void router::ApiRoutes::fix_v2_route(HttpServer& server)
         } else
             missing_id(resp);
     });
+
+    server.GET("/*", [](const HttpReq* req, HttpResp* resp) {
+        resp->set_status(404);
+        resp->Json(ordered_json {
+            { "message", "[Router] -> 404 Route not found" } }
+                       .dump());
+    });
 }
