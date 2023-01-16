@@ -21,10 +21,13 @@ static void missing_id(HttpResp* resp)
                    .dump());
 }
 
-static void find_car(const HttpReq* req, HttpResp* resp, int id)
+static void find_car(const HttpReq* req, HttpResp* resp, int id, std::string const& method)
 {
     if (Db::car_exists(id))
-        resp->Json(Db::get_car(id).dump());
+        resp->Json(ordered_json {
+            { "method", "[v2] -> " + method },
+            { "car", Db::get_car(id) }
+        }.dump());
     else
         not_found(resp);
 }
@@ -54,7 +57,7 @@ void router::ApiRoutes::set_v2_bp(BluePrint& bp)
     Db::init();
     bp.GET("/cars/{id}", [](const HttpReq* req, HttpResp* resp) {
         if (req->has_param("id")) {
-            find_car(req, resp, req_id(req->param("id")));
+            find_car(req, resp, req_id(req->param("id")), "GET with Path Parameter");
         } else
             missing_id(resp);
     });
@@ -89,7 +92,7 @@ void router::ApiRoutes::fix_v2_route(HttpServer& server)
 {
     server.GET("/api/v2/cars", [](const HttpReq* req, HttpResp* resp) {
         if (req->has_query("id")) {
-            find_car(req, resp, req_id(req->query("id")));
+            find_car(req, resp, req_id(req->query("id")), "GET with Query Parameter");
         } else {
             std::vector<ordered_json> cars = Db::all();
             resp->Json(ordered_json {
