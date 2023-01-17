@@ -73,7 +73,7 @@ jobs:
           actions-cache-key: ${{ matrix.os }}'-cache'
 
       - name: Generate Cmake files
-        run: xmake project -k cmakelists
+        run: xmake project -k cmakelists -y
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
