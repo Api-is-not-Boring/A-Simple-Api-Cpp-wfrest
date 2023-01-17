@@ -65,6 +65,16 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
+      - name: Get latest [xmake]
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+          actions-cache-folder: '.xmake-cache'
+          actions-cache-key: ${{ matrix.os }}'-cache'
+
+      - name: Generate Cmake files
+        run: xmake project -k cmakelists
+
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
 
